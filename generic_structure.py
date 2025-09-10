@@ -20,16 +20,13 @@ class GraphStructure(ABC):
     def get_min_degree(self) -> int:
         return min(len(self.get_neighbors(node)) for node in range(self.get_node_count()))
 
-    @abstractmethod
     def get_max_degree(self) -> int:
         return max(len(self.get_neighbors(node)) for node in range(self.get_node_count()))
 
-    @abstractmethod
     def get_average_degree(self) -> float:
         node_count = self.get_node_count()
         return sum(len(self.get_neighbors(node)) for node in range(node_count)) / node_count
 
-    @abstractmethod
     def get_median_degree(self) -> float:
         node_count = self.get_node_count()
         sorted_degrees = sorted(len(self.get_neighbors(node)) for node in range(node_count))
