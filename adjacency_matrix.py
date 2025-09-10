@@ -22,3 +22,9 @@ class AdjacencyMatrix(GraphStructure):
             raise ValueError('Self-edges are not allowed.')
         self.adjacency_matrix[node_1][node_2] = 1
         self.adjacency_matrix[node_2][node_1] = 1
+
+    def get_edge_count(self) -> int:
+        return sum(sum(row) for row in self.adjacency_matrix) / 2
+    
+    def get_node_count(self) -> int:
+        return len(self.adjacency_matrix)
