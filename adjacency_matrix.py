@@ -28,3 +28,19 @@ class AdjacencyMatrix(GraphStructure):
     
     def get_node_count(self) -> int:
         return len(self.adjacency_matrix)
+
+    def get_min_degree(self) -> int:
+        return min(sum(row) for row in self.adjacency_matrix)
+
+    def get_max_degree(self) -> int:
+        return max(sum(row) for row in self.adjacency_matrix)
+
+    def get_average_degree(self) -> float:
+        return sum(sum(row) for row in self.adjacency_matrix) / self.get_node_count()
+
+    def get_median_degree(self) -> float:
+        degrees = [sum(row) for row in self.adjacency_matrix]
+        degrees.sort()
+        if len(degrees) % 2 == 1:
+            return degrees[len(degrees) // 2]
+        return (degrees[len(degrees) // 2 - 1] + degrees[len(degrees) // 2]) / 2
