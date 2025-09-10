@@ -14,6 +14,10 @@ class GraphStructure(ABC):
         pass
 
     @abstractmethod
+    def get_neighbors(self, node: int) -> list[int]:
+        pass
+
+    @abstractmethod
     def get_min_degree(self) -> int:
         pass
 
