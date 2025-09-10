@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import deque
 
 class GraphStructure(ABC):
     @abstractmethod
@@ -6,40 +7,72 @@ class GraphStructure(ABC):
         pass
 
     @abstractmethod
-    def get_edge_count(self) -> int:
+    def get_neighbors(self, node: int) -> list[int]:
         pass
 
     @abstractmethod
     def get_node_count(self) -> int:
         pass
 
-    @abstractmethod
-    def get_neighbors(self, node: int) -> list[int]:
-        pass
+    def get_edge_count(self) -> int:
+        return sum(len(self.get_neighbors(node)) for node in range(self.get_node_count())) / 2
 
-    @abstractmethod
     def get_min_degree(self) -> int:
-        pass
+        return min(len(self.get_neighbors(node)) for node in range(self.get_node_count()))
 
     @abstractmethod
     def get_max_degree(self) -> int:
-        pass
+        return max(len(self.get_neighbors(node)) for node in range(self.get_node_count()))
 
     @abstractmethod
     def get_average_degree(self) -> float:
-        pass
+        node_count = self.get_node_count()
+        return sum(len(self.get_neighbors(node)) for node in range(node_count)) / node_count
 
     @abstractmethod
     def get_median_degree(self) -> float:
-        pass
+        node_count = self.get_node_count()
+        sorted_degrees = sorted(len(self.get_neighbors(node)) for node in range(node_count))
+        mid_index = node_count // 2
+        if node_count % 2 == 0:
+            return (sorted_degrees[mid_index - 1] + sorted_degrees[mid_index]) / 2
+        return sorted_degrees[mid_index]
 
-    @abstractmethod
-    def search_breadth_first(self, start_node: int) -> list[tuple[int, int]]:
-        pass
+    def search_breadth_first(self, start_node: int) -> list[tuple[int, int]]: # (parent, depth)
+        if start_node >= (node_count := self.get_node_count()):
+            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
+        elif start_node < 0:
+            raise ValueError('Node index must be non-negative.')
+        
+        visited = [(None, None) for _ in range(self.get_node_count())]
+        visited[start_node] = (None, 0)  # (parent, depth)
 
-    @abstractmethod
-    def search_depth_first(self, start_node: int) -> list[tuple[int, int]]:
-        pass
+        queue = deque([start_node]) # (node, parent)
+        while queue:
+            current_node = queue.popleft()
+            for neighbor_index in self.get_neighbors(current_node):
+                if visited[neighbor_index][1] is None:
+                    visited[neighbor_index] = (current_node, visited[current_node][1] + 1)
+                    queue.append(neighbor_index)
+        return visited
+
+    def search_depth_first(self, start_node: int) -> list[tuple[int, int]]: # (parent, depth)
+        if start_node >= (node_count := self.get_node_count()):
+            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
+        elif start_node < 0:
+            raise ValueError('Node index must be non-negative.')
+        
+        visited = [(None, None) for _ in range(self.get_node_count())]
+
+        stack = deque([(start_node, None)]) # (node, parent)
+        while stack:
+            current_node, current_parent = stack.pop()
+            if visited[current_node][1] is not None:
+                continue
+            visited[current_node] = (current_parent, visited[current_parent][1] + 1 if current_parent is not None else 0)
+            for neighbor_index in self.get_neighbors(current_node):
+                stack.append((neighbor_index, current_node))
+        return visited
 
     def get_distance(self, node_1: int, node_2: int) -> int | None:
         if node_1 >= (node_count := self.get_node_count()) or node_2 >= node_count:
