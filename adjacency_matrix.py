@@ -1,3 +1,4 @@
+from collections import deque
 from generic_structure import GraphStructure
 
 class AdjacencyMatrix(GraphStructure):
@@ -44,3 +45,41 @@ class AdjacencyMatrix(GraphStructure):
         if len(degrees) % 2 == 1:
             return degrees[len(degrees) // 2]
         return (degrees[len(degrees) // 2 - 1] + degrees[len(degrees) // 2]) / 2
+    
+    def search_breadth_first(self, start_node: int) -> list[tuple[int, int]]: # (parent, depth)
+        if start_node >= (node_count := self.get_node_count()):
+            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
+        elif start_node < 0:
+            raise ValueError('Node index must be non-negative.')
+        
+        visited = [(None, None) for _ in range(self.get_node_count())]
+        visited[start_node] = (None, 0)  # (parent, depth)
+
+        queue = deque([start_node]) # (node, parent)
+        while queue:
+            current_node = queue.popleft()
+            for neighbor_index, is_connected in enumerate(self.adjacency_matrix[current_node]):
+                if is_connected and visited[neighbor_index][1] is None:
+                    visited[neighbor_index] = (current_node, visited[current_node][1] + 1)
+                    queue.append(neighbor_index)
+
+        return visited
+    
+    def search_depth_first(self, start_node: int) -> list[tuple[int, int]]: # (parent, depth)
+        if start_node >= (node_count := self.get_node_count()):
+            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
+        elif start_node < 0:
+            raise ValueError('Node index must be non-negative.')
+        
+        visited = [(None, None) for _ in range(self.get_node_count())]
+
+        stack = deque([(start_node, None)]) # (node, parent)
+        while stack:
+            current_node, current_parent = stack.pop()
+            if visited[current_node][1] is not None:
+                continue
+            visited[current_node] = (current_parent, visited[current_parent][1] + 1 if current_parent is not None else 0)
+            for neighbor_index, is_connected in enumerate(self.adjacency_matrix[current_node]):
+                if is_connected:
+                    stack.append((neighbor_index, current_node))
+        return visited
