@@ -26,3 +26,10 @@ class AdjacencyMatrix(GraphStructure):
     
     def get_node_count(self) -> int:
         return len(self.adjacency_matrix)
+    
+    def get_neighbors(self, node: int) -> list[int]:
+        if node >= (node_count := self.get_node_count()):
+            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
+        elif node < 0:
+            raise ValueError('Node index must be non-negative.')
+        return [i for i, is_neighbor in enumerate(self.adjacency_matrix[node]) if is_neighbor]
