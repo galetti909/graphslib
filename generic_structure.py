@@ -57,7 +57,15 @@ class GraphStructure(ABC):
         return max(depth for _, depth in bfs_from_farthest)
 
     def list_connected_components(self) -> tuple[int, list[list[int]]]:
-        pass
+        components: list[list[int]] = []
+        node_count = self.get_node_count()
+        nodes = set(range(node_count))
+        while sum(len(component) for component in components) < node_count:
+            current_node = next(nodes - set(sum(components, start=[])))
+            bfs_result = self.search_breadth_first(current_node)
+            component = [index for index, (_, depth) in enumerate(bfs_result) if depth is not None]
+            components.append(component)
+        return len(components), components
 
     def __str__(self):
         connected_components = self.list_connected_components()
