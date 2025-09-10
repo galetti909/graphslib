@@ -30,11 +30,11 @@ class GraphStructure(ABC):
         pass
 
     @abstractmethod
-    def search_breadth_first(self, start_node: int) -> list[tuple[int, int, int]]:
+    def search_breadth_first(self, start_node: int) -> list[tuple[int, int]]:
         pass
 
     @abstractmethod
-    def search_depth_first(self, start_node: int) -> list[tuple[int, int, int]]:
+    def search_depth_first(self, start_node: int) -> list[tuple[int, int]]:
         pass
 
     @abstractmethod
