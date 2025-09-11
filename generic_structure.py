@@ -14,6 +14,13 @@ class GraphStructure(ABC):
     def get_node_count(self) -> int:
         pass
 
+    def validate_node_index(self, *nodes: int) -> None:
+        for node in nodes:
+            if node >= (node_count := self.get_node_count()):
+                raise ValueError(f'Node index {node} out of bounds. Last valid index is {node_count - 1}.')
+            elif node < 0:
+                raise ValueError(f'Node index {node} must be non-negative.')
+
     def get_edge_count(self) -> int:
         return sum(len(self.get_neighbors(node)) for node in range(self.get_node_count())) / 2
 
@@ -36,11 +43,8 @@ class GraphStructure(ABC):
         return sorted_degrees[mid_index]
 
     def search_breadth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int, int]]: # (parent, depth)
-        if start_node >= (node_count := self.get_node_count()):
-            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
-        elif start_node < 0:
-            raise ValueError('Node index must be non-negative.')
-        
+        self.validate_node_index(start_node)
+
         visited = [(None, None) for _ in range(self.get_node_count())]
         visited[start_node] = (None, 0)  # (parent, depth)
 
@@ -60,10 +64,7 @@ class GraphStructure(ABC):
         return visited
 
     def search_depth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int, int]]: # (parent, depth)
-        if start_node >= (node_count := self.get_node_count()):
-            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
-        elif start_node < 0:
-            raise ValueError('Node index must be non-negative.')
+        self.validate_node_index(start_node)
         
         visited = [(None, None) for _ in range(self.get_node_count())]
 
@@ -84,11 +85,8 @@ class GraphStructure(ABC):
         return visited
 
     def get_distance(self, node_1: int, node_2: int) -> int | None:
-        if node_1 >= (node_count := self.get_node_count()) or node_2 >= node_count:
-            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
-        elif node_1 < 0 or node_2 < 0:
-            raise ValueError('Node index must be non-negative.')
-        
+        self.validate_node_index(node_1, node_2)
+
         bfs_result = self.search_breadth_first(node_1)
         return bfs_result[node_2][1] if bfs_result[node_2][1] is not None else None
 

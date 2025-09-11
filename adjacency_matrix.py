@@ -15,11 +15,8 @@ class AdjacencyMatrix(GraphStructure):
                     self.add_edge(int(nodes[0]), int(nodes[1]))
 
     def add_edge(self, node_1: int, node_2: int):
-        if node_1 >= (node_count := self.get_node_count()) or node_2 >= node_count:
-            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
-        elif node_1 < 0 or node_2 < 0:
-            raise ValueError('Node index must be non-negative.')
-        elif node_1 == node_2:
+        self.validate_node_index(node_1, node_2)
+        if node_1 == node_2:
             raise ValueError('Self-edges are not allowed.')
         self.adjacency_matrix[node_1][node_2] = 1
         self.adjacency_matrix[node_2][node_1] = 1
@@ -28,8 +25,5 @@ class AdjacencyMatrix(GraphStructure):
         return len(self.adjacency_matrix)
     
     def get_neighbors(self, node: int) -> list[int]:
-        if node >= (node_count := self.get_node_count()):
-            raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
-        elif node < 0:
-            raise ValueError('Node index must be non-negative.')
+        self.validate_node_index(node)
         return [i for i, is_neighbor in enumerate(self.adjacency_matrix[node]) if is_neighbor]
