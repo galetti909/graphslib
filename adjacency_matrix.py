@@ -1,4 +1,3 @@
-from collections import deque
 from generic_structure import GraphStructure
 
 class AdjacencyMatrix(GraphStructure):
