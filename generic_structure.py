@@ -35,7 +35,7 @@ class GraphStructure(ABC):
             return (sorted_degrees[mid_index - 1] + sorted_degrees[mid_index]) / 2
         return sorted_degrees[mid_index]
 
-    def search_breadth_first(self, start_node: int) -> list[tuple[int, int]]: # (parent, depth)
+    def search_breadth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int, int]]: # (parent, depth)
         if start_node >= (node_count := self.get_node_count()):
             raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
         elif start_node < 0:
@@ -51,9 +51,15 @@ class GraphStructure(ABC):
                 if visited[neighbor_index][1] is None:
                     visited[neighbor_index] = (current_node, visited[current_node][1] + 1)
                     queue.append(neighbor_index)
+        if text_file_path:
+            text = 'Node\tParent\tDepth\n'
+            for index, (parent, depth) in enumerate(visited):
+                text += f'{index}\t{parent}\t{depth}\n'
+            with open(text_file_path, 'w') as f:
+                f.write(text)
         return visited
 
-    def search_depth_first(self, start_node: int) -> list[tuple[int, int]]: # (parent, depth)
+    def search_depth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int, int]]: # (parent, depth)
         if start_node >= (node_count := self.get_node_count()):
             raise ValueError(f'Node index out of bounds. Last valid index is {node_count - 1}.')
         elif start_node < 0:
@@ -69,6 +75,12 @@ class GraphStructure(ABC):
             visited[current_node] = (current_parent, visited[current_parent][1] + 1 if current_parent is not None else 0)
             for neighbor_index in self.get_neighbors(current_node):
                 stack.append((neighbor_index, current_node))
+        if text_file_path:
+            text = 'Node\tParent\tDepth\n'
+            for index, (parent, depth) in enumerate(visited):
+                text += f'{index}\t{parent}\t{depth}\n'
+            with open(text_file_path, 'w') as f:
+                f.write(text)
         return visited
 
     def get_distance(self, node_1: int, node_2: int) -> int | None:
@@ -101,7 +113,11 @@ class GraphStructure(ABC):
             components.append(component)
         return len(components), components
 
-    def __str__(self):
+    def generate_graph_text_file(self, file_path: str) -> None:
+        with open(file_path, 'w') as f:
+            f.write(str(self))
+
+    def __str__(self) -> str:
         connected_components = self.list_connected_components()
         connected_components_text = '\n'.join([f'Nodes size: {len(comp)}, {comp}' for comp in connected_components[1]])
         return f'Node count: {self.get_node_count()}\n' \
