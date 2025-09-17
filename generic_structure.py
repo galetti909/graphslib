@@ -45,7 +45,7 @@ class GraphStructure(ABC):
             return (sorted_degrees[mid_index - 1] + sorted_degrees[mid_index]) / 2
         return float(sorted_degrees[mid_index])
 
-    def search_breadth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int | None, int | None]]:
+    def search_breadth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int | None, int | None]]:  # (parent, depth)
         self.validate_node_index(start_node)
         node_count = self.get_node_count()
         visited = [(None, None) for _ in range(node_count)]
@@ -67,7 +67,7 @@ class GraphStructure(ABC):
                     f.write(f'{index + 1}\t{parent_display}\t{depth}\n')
         return visited
 
-    def search_depth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int | None, int | None]]:
+    def search_depth_first(self, start_node: int, text_file_path: str = '') -> list[tuple[int | None, int | None]]: # (parent, depth)
         self.validate_node_index(start_node)
         node_count = self.get_node_count()
         visited = [(None, None) for _ in range(node_count)]
