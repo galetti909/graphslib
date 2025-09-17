@@ -104,15 +104,14 @@ class GraphStructure(ABC):
             
         # heuristic 2-BFS to diameter
         bfs_from_zero = self.search_breadth_first(0)
-        depths = [item[1] for item in bfs_from_zero]
+        depths = [depth for _, depth in bfs_from_zero]
         if None in depths: # Grafo desconexo
             return None 
 
         farthest_node_from_zero = depths.index(max(depths))
-        
         bfs_from_farthest = self.search_breadth_first(farthest_node_from_zero)
         
-        final_depths = [item[1] for item in bfs_from_farthest]
+        final_depths = [depth for _, depth in bfs_from_farthest]
         return max(final_depths)
 
     def list_connected_components(self) -> tuple[int, list[list[int]]]:
