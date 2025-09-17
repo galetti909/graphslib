@@ -4,13 +4,11 @@ class AdjacencyVector(GraphStructure):
     def __init__(self, file_path: str) -> None:
         with open(file_path, 'r') as f:
             node_count = int(f.readline().strip())
-            # Correct initialization to avoid all lists being the same reference
             self.adjacency_vector = [[] for _ in range(node_count)]
 
             for line in f.readlines():
                 nodes = line.strip().split()
                 if len(nodes) == 2:
-                    # fix: adjust indexion to base 0
                     node_1 = int(nodes[0]) - 1
                     node_2 = int(nodes[1]) - 1
                     self.add_edge(node_1, node_2)
@@ -19,10 +17,8 @@ class AdjacencyVector(GraphStructure):
         self.validate_node_index(node_1, node_2)
         if node_1 == node_2:
             raise ValueError('Self-edges are not allowed.')
-        # ensure there aren't duplicates edges
         if node_2 not in self.adjacency_vector[node_1]:
             self.adjacency_vector[node_1].append(node_2)
-        if node_1 not in self.adjacency_vector[node_2]:
             self.adjacency_vector[node_2].append(node_1)
 
     def get_node_count(self) -> int:
