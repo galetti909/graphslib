@@ -99,8 +99,8 @@ class GraphStructure(ABC):
         return bfs_result[node_2][1]
 
     def get_diameter(self) -> int | None:
-        if self.get_node_count() == 0:
-            return 0
+        if self.get_node_count() <= 1:
+            return None
             
         # heuristic 2-BFS to diameter
         bfs_from_zero = self.search_breadth_first(0)
