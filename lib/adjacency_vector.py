@@ -1,4 +1,5 @@
-from generic_structure import GraphStructure
+from .generic_structure import GraphStructure
+from .utils import decrement_input_nodes_index
 
 class AdjacencyVector(GraphStructure):
     def __init__(self, file_path: str) -> None:
@@ -9,11 +10,11 @@ class AdjacencyVector(GraphStructure):
             for line in f.readlines():
                 nodes = line.strip().split()
                 if len(nodes) == 2:
-                    node_1 = int(nodes[0]) - 1
-                    node_2 = int(nodes[1]) - 1
-                    self.add_edge(node_1, node_2)
+                    self.add_edge(int(nodes[0]), int(nodes[1]))
 
     def add_edge(self, node_1: int, node_2: int):
+        node_1 = decrement_input_nodes_index(node_1)
+        node_2 = decrement_input_nodes_index(node_2)
         self.validate_node_index(node_1, node_2)
         if node_1 == node_2:
             raise ValueError('Self-edges are not allowed.')
@@ -24,6 +25,6 @@ class AdjacencyVector(GraphStructure):
     def get_node_count(self) -> int:
         return len(self.adjacency_vector)
 
-    def get_neighbors(self, node: int) -> list[int]:
+    def _get_neighbors(self, node: int) -> list[int]:
         self.validate_node_index(node)
         return self.adjacency_vector[node]

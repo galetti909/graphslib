@@ -1,4 +1,5 @@
-from generic_structure import GraphStructure
+from .generic_structure import GraphStructure
+from .utils import decrement_entry_nodes_index
 
 class AdjacencyMatrix(GraphStructure):
     def __init__(self, file_path: str) -> None:
@@ -13,11 +14,11 @@ class AdjacencyMatrix(GraphStructure):
                 nodes = line.strip().split()
                 if len(nodes) == 2:
                     # fix: adjust indexing to 0
-                    node_1 = int(nodes[0]) - 1
-                    node_2 = int(nodes[1]) - 1
-                    self.add_edge(node_1, node_2)
+                    self.add_edge(int(nodes[0]), int(nodes[1]))
 
     def add_edge(self, node_1: int, node_2: int):
+        node_1 = decrement_entry_nodes_index(node_1)
+        node_2 = decrement_entry_nodes_index(node_2)
         self.validate_node_index(node_1, node_2)
         if node_1 == node_2:
             raise ValueError('Self-edges are not allowed.')
@@ -27,6 +28,6 @@ class AdjacencyMatrix(GraphStructure):
     def get_node_count(self) -> int:
         return len(self.adjacency_matrix)
     
-    def get_neighbors(self, node: int) -> list[int]:
+    def _get_neighbors(self, node: int) -> list[int]: # Private method to avoid nodes index confusion
         self.validate_node_index(node)
         return [i for i, is_neighbor in enumerate(self.adjacency_matrix[node]) if is_neighbor]
