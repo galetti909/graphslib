@@ -1,11 +1,10 @@
-import time
 import random
 import os
-import psutil
+from numpy._core._exceptions import _ArrayMemoryError
 
 from lib import AdjacencyMatrix, AdjacencyVector
 
-from cases import (
+from case_study.cases import (
     case_1_memory_analysis,
     cases_2_3_bfs_dfs_performance,
     case_4_parents_in_search_trees,
@@ -18,31 +17,33 @@ def show_results(case_1, case_2, case_3, case_4, case_5, case_6, case_7) -> None
     print("\n--- Case Study Results ---\n")
     
     print("Case 1: Memory Usage (in bytes)")
-    print(f"  Adjacency Matrix: {case_1[0]:,} bytes")
-    print(f"  Adjacency Vector: {case_3[0]:,} bytes\n")
+    if case_1[0] is None:
+        print("  Adjacency Matrix: Analysis skipped due to memory error")
+    else:
+        print(f"  Adjacency Matrix: {case_1[0]:,} mega bytes")
+    print(f"  Adjacency Vector: {case_3[0]:,} mega bytes\n")
 
     print("Case 2 & 3: Average Search Times (in seconds)")
-    print(f"  Adjacency Matrix - BFS: {case_2[0]:.6f} s, DFS: {case_2[1]:.6f} s")
-    print(f"  Adjacency Vector - BFS: {case_3[1]:.6f} s, DFS: {case_3[2]:.6f} s\n")
+    if case_2[0] is None:
+        print("  Adjacency Matrix: Analysis skipped due to memory error")
+    else:
+        print(f"  Adjacency Matrix - BFS: {case_2[0]:.6f} s, DFS: {case_2[1]:.6f} s")
+    print(f"  Adjacency Vector - BFS: {case_3[0]:.6f} s, DFS: {case_3[1]:.6f} s\n")
 
     print("Case 4: Parents in Search Trees")
     for i, parents in enumerate(case_4, start=1):
-        print(f"  Start Node {i}: Parents -> {parents}")
-    print()
+        print(f"  Start Node {i}: Parents -> {parents}\n")
 
     print("Case 5: Distances Between Vertex Pairs")
     for i, distance in enumerate(case_5, start=1):
         node_pair = [(10, 20), (10, 30), (20, 30)][i-1]
         dist_str = distance if distance is not None else 'Unreachable'
-        print(f"  Distance between nodes {node_pair}: {dist_str}")
-    print()
+        print(f"  Distance between nodes {node_pair}: {dist_str}\n")
 
     print("Case 6: Connected Components")
-    num_components, components = case_6
+    num_components, size_greatest_component = case_6
     print(f"  Number of Connected Components: {num_components}")
-    for i, component in enumerate(components, start=1):
-        print(f"    Component {i}: Nodes -> {component}")
-    print()
+    print(f"  Size of Greatest Component: {size_greatest_component}\n")
 
     print("Case 7: Graph Diameter")
     diameter = case_7
@@ -66,40 +67,51 @@ def run_case_study(graph_file_path: str) -> list[tuple[float, float, float]] | N
     case_1 = []
 
     # Adjacency Matrix
-    graph = AdjacencyMatrix(graph_file_path)
+    print("\nBuilding Adjacency Matrix Representation...")
+    try:
+        graph = AdjacencyMatrix(graph_file_path)
+        case_1.append(case_1_memory_analysis(graph))
+        node_count = graph.get_node_count()
+        num_runs = min(100, node_count)
+        start_nodes = random.sample(range(1, node_count + 1), num_runs)
+        print("Measuring BFS and DFS performance...")
+        bfs_avg_time, dfs_avg_time = cases_2_3_bfs_dfs_performance(graph, start_nodes)
+        case_2 = (bfs_avg_time, dfs_avg_time)
+    except (MemoryError, _ArrayMemoryError) as e:
+        print(f"Skipping Adjacency Matrix analysis due to memory error: {e}")
+        case_1.append(None)
+        case_2 = (None, None)
+
+    # Adjacency Vector
+    print("\nBuilding Adjacency Vector Representation...")
+    graph = AdjacencyVector(graph_file_path)
     case_1.append(case_1_memory_analysis(graph))
     node_count = graph.get_node_count()
     num_runs = min(100, node_count)
-    start_nodes = random.sample(range(node_count), num_runs)
+    start_nodes = random.sample(range(1, node_count + 1), num_runs)
+    print("Measuring BFS and DFS performance...")
     bfs_avg_time, dfs_avg_time = cases_2_3_bfs_dfs_performance(graph, start_nodes)
-    case_2 = (bfs_avg_time, dfs_avg_time)
-    del mem_usage, bfs_avg_time, dfs_avg_time
-    
-    # Adjacency Vector
-    graph = AdjacencyVector(graph_file_path)
-    mem_usage = case_1_memory_analysis(graph)
-    node_count = graph.get_node_count()
-    num_runs = min(100, node_count)
-    start_nodes = random.sample(range(node_count), num_runs)
-    bfs_avg_time, dfs_avg_time = cases_2_3_bfs_dfs_performance(graph, start_nodes)
-    case_3 = (mem_usage, bfs_avg_time, dfs_avg_time)
+    case_3 = (bfs_avg_time, dfs_avg_time)
 
     # --- Part 2: Direct Answers ---
+    print("Searching for direct answers to cases 4-7...")
     case_4 = []
     start_nodes = [1, 2, 3]
     target_nodes = [10, 20, 30]
     for start_node in start_nodes:
-        case_4.append(case_4_parents_in_search_trees(start_node, target_nodes))
+        case_4.append(case_4_parents_in_search_trees(graph, start_node, target_nodes))
 
+    print("5")
     case_5 = []
     pairs = [(10, 20), (10, 30), (20, 30)]
     for node_1, node_2 in pairs:
         distance = case_5_distance_between_vertices(graph, node_1, node_2)
         case_5.append(distance)
-        print(f"Distance between ({node_1}, {node_2}): {distance if distance is not None else 'Unreachable'}")
 
+    print("6")
     case_6 = case_6_connected_components(graph)
 
+    print("7")
     case_7 = case_7_graph_diameter(graph)
 
     print("=" * 60)
@@ -108,16 +120,14 @@ def run_case_study(graph_file_path: str) -> list[tuple[float, float, float]] | N
 
     show_results(case_1, case_2, case_3, case_4, case_5, case_6, case_7)
 
-
 if __name__ == '__main__':
-    # Place the names of the graph files you need to analyze here
     graph_files_to_analyze = [
-        'grafo_1.txt', 
-        'grafo_2.txt', 
-        'grafo_3.txt', 
-        'grafo_4.txt', 
-        'grafo_5.txt', 
-        'grafo_6.txt'
+        'case_study/graphs/grafo_1.txt', 
+        'case_study/graphs/grafo_2.txt', 
+        'case_study/graphs/grafo_3.txt', 
+        'case_study/graphs/grafo_4.txt', 
+        'case_study/graphs/grafo_5.txt', 
+        'case_study/graphs/grafo_6.txt'
     ]
     for graph_file in graph_files_to_analyze:
         run_case_study(graph_file)
