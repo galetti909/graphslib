@@ -21,7 +21,7 @@ def show_results(case_1, case_2, case_3, case_4, case_5, case_6, case_7) -> None
         print("  Adjacency Matrix: Analysis skipped due to memory error")
     else:
         print(f"  Adjacency Matrix: {case_1[0]:,} mega bytes")
-    print(f"  Adjacency Vector: {case_3[0]:,} mega bytes\n")
+    print(f"  Adjacency Vector: {case_1[1]:,} mega bytes\n")
 
     print("Case 2 & 3: Average Search Times (in seconds)")
     if case_2[0] is None:
