@@ -1,4 +1,3 @@
-# lib/adjacency_matrix.py
 from .generic_structure import GraphStructure
 import math
 
