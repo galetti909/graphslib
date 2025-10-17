@@ -65,7 +65,7 @@ class GraphStructure(ABC):
         queue = deque([start_node])
         while queue:
             current_node = queue.popleft()
-            for neighbor_index in self.get_neighbors(current_node):
+            for neighbor_index, _ in self.get_neighbors(current_node):
                 if visited[neighbor_index][1] is None:
                     visited[neighbor_index] = (current_node, visited[current_node][1] + 1)
                     queue.append(neighbor_index)
@@ -91,7 +91,7 @@ class GraphStructure(ABC):
             
             visited[current_node] = (parent, depth)
             
-            for neighbor_index in sorted(self.get_neighbors(current_node), reverse=True):
+            for neighbor_index, _ in sorted(self.get_neighbors(current_node), reverse=True):
                 if visited[neighbor_index][1] is None:
                     stack.append((neighbor_index, current_node, depth + 1))
 
