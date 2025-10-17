@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import deque
+from typing import Type
 
 
 class GraphStructure(ABC):
@@ -142,6 +143,29 @@ class GraphStructure(ABC):
 
         components.sort(key=len, reverse=True)
         return len(components), components
+
+    def get_all_distances(self, start_node: int, queue_type: Type[list]) -> list[tuple[float, int | None]]:
+        '''Given a start node, returns the distance to all other nodes, and its father through best path'''
+        if self.has_negative_weight:
+            raise ValueError('Graph contains negative weight edges; Dijkstra\'s algorithm cannot be applied. Algorithms for negative weights not implemented yet.')
+        priority_queue = queue_type()
+        priority_queue.append((0, start_node)) #adicionar
+        distances_and_fathers = [(float('inf'), None)] * (self.get_node_count() + 1)
+        distances_and_fathers[start_node] = (0, None)
+        is_explored = [False] * (self.get_node_count() + 1)
+        while priority_queue:
+            current_distance, current_node = min(priority_queue) #pegar min
+            priority_queue.remove((current_distance, current_node)) #retirar da queue
+            is_explored[current_node] = True
+            for neighbor, weight in self.get_neighbors(current_node):
+                neighbor_current_distance = distances_and_fathers[neighbor][0]
+                if not is_explored[neighbor]:
+                    distance = current_distance + weight
+                    if distance < neighbor_current_distance:
+                        if (neighbor_current_distance, neighbor) in priority_queue:
+                            priority_queue.remove((neighbor_current_distance, neighbor))
+                        priority_queue.append((distance, neighbor))
+        return distances_and_fathers
 
     def generate_graph_text_file(self, file_path: str) -> None:
         '''Generates a text file representation of the graph's properties.'''
