@@ -1,5 +1,3 @@
-# custom_heap.py
-
 class IndexedMinHeap:
     def __init__(self):
         # Initializes the heap and the position map.
