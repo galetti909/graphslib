@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from typing import Type
+from lib.classes.dijkstra.dijkstra_heap import DijkstraHeap
 from lib.classes.dijkstra.generic_dijkstra_structures_manager import GenericDijkstraStructuresManager
 
 
@@ -151,7 +152,7 @@ class GraphStructure(ABC):
         components.sort(key=len, reverse=True)
         return len(components), components
 
-    def get_all_distances(self, start_node: int, queue_type: Type[GenericDijkstraStructuresManager]) -> list[tuple[float, int | None]]:
+    def get_all_distances(self, start_node: int, queue_type: Type[GenericDijkstraStructuresManager] = DijkstraHeap) -> list[tuple[float, int | None]]:
         '''Given a start node, returns the distance to all other nodes, and its father through best path'''
         if self.has_negative_weight:
             raise ValueError('Graph contains negative weight edges; Dijkstra\'s algorithm cannot be applied. Algorithms for negative weights not implemented yet.')
