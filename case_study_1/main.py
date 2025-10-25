@@ -1,10 +1,9 @@
 import random
 import os
-from numpy._core._exceptions import _ArrayMemoryError
 
 from lib import AdjacencyMatrix, AdjacencyVector
 
-from case_study.cases import (
+from case_study_1.cases import (
     case_1_memory_analysis,
     cases_2_3_bfs_dfs_performance,
     case_4_parents_in_search_trees,
@@ -77,7 +76,7 @@ def run_case_study(graph_file_path: str) -> list[tuple[float, float, float]] | N
         print("Measuring BFS and DFS performance...")
         bfs_avg_time, dfs_avg_time = cases_2_3_bfs_dfs_performance(graph, start_nodes)
         case_2 = (bfs_avg_time, dfs_avg_time)
-    except (MemoryError, _ArrayMemoryError) as e:
+    except MemoryError as e:
         print(f"Skipping Adjacency Matrix analysis due to memory error: {e}")
         case_1.append(None)
         case_2 = (None, None)
