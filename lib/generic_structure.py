@@ -1,12 +1,19 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from typing import Type
+from lib.classes.dijkstra.generic_dijkstra_structures_manager import GenericDijkstraStructuresManager
 
 
 class GraphStructure(ABC):
     @abstractmethod
     def __init__(self, file_path: str) -> None:
         '''Initializes the graph structure from a text file.'''
+        pass
+
+    @property
+    @abstractmethod
+    def has_negative_weight(self) -> bool:
+        '''Indicates whether the graph contains any negative weight edges.'''
         pass
 
     @abstractmethod
