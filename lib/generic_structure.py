@@ -152,15 +152,15 @@ class GraphStructure(ABC):
         components.sort(key=len, reverse=True)
         return len(components), components
 
-    def get_all_distances(self, start_node: int, queue_type: Type[GenericDijkstraStructuresManager] = DijkstraHeap) -> list[tuple[float, int | None]]:
+    def get_all_distances_and_fathers(self, start_node: int, queue_type: Type[GenericDijkstraStructuresManager] = DijkstraHeap) -> list[tuple[float, int | None]]:
         '''Given a start node, returns the distance to all other nodes, and its father through best path'''
         if self.has_negative_weight:
             raise ValueError('Graph contains negative weight edges; Dijkstra\'s algorithm cannot be applied. Algorithms for negative weights not implemented yet.')
         dijkstra_manager = queue_type(start_node, self.get_node_count())
-        while not dijkstra_manager.stop():
-            current_node, current_distance = dijkstra_manager.get_next_min()
+        while next := dijkstra_manager.get_next_min():
+            current_node, current_distance = next
             for neighbor, weight in self.get_neighbors(current_node):
-                dijkstra_manager.update_distance(current_distance, neighbor, weight)
+                dijkstra_manager.update_distance(current_node, current_distance, neighbor, weight)
         return dijkstra_manager.result()
 
     def generate_graph_text_file(self, file_path: str) -> None:
