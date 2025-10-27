@@ -121,12 +121,12 @@ def run_case_study(graph_file_path: str) -> list[tuple[float, float, float]] | N
 
 if __name__ == '__main__':
     graph_files_to_analyze = [
-        'case_study/graphs/grafo_1.txt', 
-        'case_study/graphs/grafo_2.txt', 
-        'case_study/graphs/grafo_3.txt', 
-        'case_study/graphs/grafo_4.txt', 
-        'case_study/graphs/grafo_5.txt', 
-        'case_study/graphs/grafo_6.txt'
+        'case_study_1/graphs/grafo_1.txt', 
+        'case_study_1/graphs/grafo_2.txt', 
+        'case_study_1/graphs/grafo_3.txt', 
+        'case_study_1/graphs/grafo_4.txt', 
+        'case_study_1/graphs/grafo_5.txt', 
+        'case_study_1/graphs/grafo_6.txt'
     ]
     for graph_file in graph_files_to_analyze:
         run_case_study(graph_file)
