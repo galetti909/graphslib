@@ -1,0 +1,3 @@
+# Ignora os arquivos de grafos grandes
+case_study_2/graphs/grafo_W_*.txt
+case_study_2/graphs/rede_colaboracao.txt
