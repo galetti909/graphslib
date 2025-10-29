@@ -1,13 +1,15 @@
 from lib import AdjacencyVector
 from case_study_2.cases import case_1_min_distances, case_2_dijkstra_performance_comparison, case_3_distance_between_researchers
 
+# Helper function to reconstruct the shortest path from Dijkstra's (distance, father) output
 def get_path(distances_and_fathers: list[tuple[float, int | None]], end_node: int) -> list[int]:
     path = []
     current_node = end_node
+    # Backtrack from end_node to the source (where father is None)
     while current_node is not None:
         path.append(current_node)
         _, current_node = distances_and_fathers[current_node]
-    return path[::-1]
+    return path[::-1] # Reverse path to be start -> end
 
 def run_case_study_2_part_1(graph_file_path: str):
 
@@ -34,7 +36,7 @@ def run_case_study_2_part_1(graph_file_path: str):
     print(f"10 to 60: {min_distances[60]}")
     print(' -> '.join(map(str, get_path(min_distances, 60))))
 
-    # Case 2: Dijkstra Performance Comparison
+    # Case 2: Dijkstra Performance Comparison (Vector vs. Heap)
     print("Comparing Dijkstra performance with different data structures...")
     avg_time_vector, avg_time_heap = case_2_dijkstra_performance_comparison(graph)
     print(f"Average time using Dijkstra with Vector: {avg_time_vector:.6f} seconds")
@@ -49,6 +51,7 @@ def run_case_study_2_part_2():
     end_researchers = ['Alan M. Turing', 'J. B. Kruskal', 'Jon M. Kleinberg', 'Éva Tardos', 'Daniel R. Figueiredo']
     print("Calculating distances between Dijkstra and other researchers...")
     result = case_3_distance_between_researchers(graph, researchers_names_file_path, start_researcher, end_researchers)
+
     for item in result:
         for name, (distance, father) in item.items():
             print(f"Distance from {start_researcher} to {name}: {distance} (via {father})")
@@ -61,8 +64,11 @@ if __name__ == '__main__':
         'case_study_2/graphs/grafo_W_4.txt',
         'case_study_2/graphs/grafo_W_5.txt'
     ]
+    # Run Cases 1 & 2 for all specified graphs
     for graph_file in graph_files_to_analyze:
         run_case_study_2_part_1(graph_file)
+    
+    # Run Case 3 on the collaboration network
     run_case_study_2_part_2()
 
     print("=" * 60)
