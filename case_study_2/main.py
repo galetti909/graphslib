@@ -56,6 +56,10 @@ def run_case_study_2_part_2():
 if __name__ == '__main__':
     graph_files_to_analyze = [
         'case_study_2/graphs/grafo_W_1.txt',
+        'case_study_2/graphs/grafo_W_2.txt',
+        'case_study_2/graphs/grafo_W_3.txt',
+        'case_study_2/graphs/grafo_W_4.txt',
+        'case_study_2/graphs/grafo_W_5.txt'
     ]
     for graph_file in graph_files_to_analyze:
         run_case_study_2_part_1(graph_file)
