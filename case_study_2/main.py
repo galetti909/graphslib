@@ -34,8 +34,6 @@ def run_case_study_2_part_1(graph_file_path: str):
     print(f"10 to 60: {min_distances[60]}")
     print(' -> '.join(map(str, get_path(min_distances, 60))))
 
-
-
     # Case 2: Dijkstra Performance Comparison
     print("Comparing Dijkstra performance with different data structures...")
     avg_time_vector, avg_time_heap = case_2_dijkstra_performance_comparison(graph)
