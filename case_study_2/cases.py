@@ -32,50 +32,47 @@ def case_2_dijkstra_performance_comparison(graph: GraphStructure) -> tuple[float
     return avg_time_vector, avg_time_heap
 
 def case_3_distance_between_researchers(graph: GraphStructure, researchers_names_file_path: str, start_researcher: str, end_researchers: list[str]) -> dict:
-    """
-    Executa o Dijkstra na rede de colaboração e retorna os dados brutos 
-    necessários para a análise.
-    """
+
     end_researchers_indexes = []
-    researchers_names = [''] # Índice 0 é nulo
+    researchers_names = [''] 
     start_researcher_index = None
 
     try:
-        # Adicionado encoding='utf-8' para nomes com acentos (ex: Éva Tardos)
         with open(researchers_names_file_path, 'r', encoding='utf-8') as f:
             for line in f.readlines():
-                # Faz a leitura de forma mais segura, caso o nome tenha vírgula
                 parts = line.strip().split(',')
                 if len(parts) < 2:
-                    continue
-                
+                    continue # Skip potentially malformed lines
+
                 i = int(parts[0])
-                name = ','.join(parts[1:]).strip() # Pega o resto da linha
-                
-                # Garante que o array de nomes tenha o tamanho correto
+                name = ','.join(parts[1:]).strip() # Rejoin name parts if comma existed
+
+                # Ensure the names list is large enough to hold the current index
                 while len(researchers_names) <= i:
-                    researchers_names.append('')
-                
+                    researchers_names.append('') # Pad with empty strings if needed
+
                 researchers_names[i] = name
-                
+
+                # Map start and end researcher names to their respective indices
                 if start_researcher == name:
                     start_researcher_index = i
                 if name in end_researchers:
                     end_researchers_indexes.append(i)
-                    
+
     except FileNotFoundError:
-        raise FileNotFoundError(f"Arquivo de nomes de pesquisadores não encontrado em: {researchers_names_file_path}")
+        # Raise specific error for missing file
+        raise FileNotFoundError(f"Researcher names file not found at: {researchers_names_file_path}")
     except Exception as e:
-        print(f"Erro ao ler o arquivo de pesquisadores: {e}")
+        # Catch other potential file reading errors
+        print(f"Error reading researcher names file: {e}")
         return {}
 
+    # Validate that the start researcher was found
     if not start_researcher_index:
-        raise ValueError(f'Pesquisador inicial "{start_researcher}" não foi encontrado no arquivo.')
+        raise ValueError(f'Start researcher "{start_researcher}" not found in the file.')
 
-    # Roda o Dijkstra
     distances_and_fathers = graph.get_all_distances_and_fathers(start_researcher_index)
 
-    # Retorna todos os dados para o main.py processar
     return {
         "distances_and_fathers": distances_and_fathers,
         "researchers_names": researchers_names,
