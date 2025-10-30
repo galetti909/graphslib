@@ -31,40 +31,54 @@ def case_2_dijkstra_performance_comparison(graph: GraphStructure) -> tuple[float
     
     return avg_time_vector, avg_time_heap
 
-def case_3_distance_between_researchers(graph: GraphStructure, researchers_names_file_path: str, start_researcher: str, end_researchers: list[str]) -> list[dict[str, tuple[float, str]]]:
-    
+def case_3_distance_between_researchers(graph: GraphStructure, researchers_names_file_path: str, start_researcher: str, end_researchers: list[str]) -> dict:
+    """
+    Executa o Dijkstra na rede de colaboração e retorna os dados brutos 
+    necessários para a análise.
+    """
     end_researchers_indexes = []
-    researchers_names = ['']  
-    
-    # Read vertex file to map names to indexes
-    with open(researchers_names_file_path, 'r') as f:
-        for line in f.readlines():
-            line = line.strip().split(',')
-            i = line[0]
-            name = line[1]
-            researchers_names.append(name.strip())
-            
-            if start_researcher == name:
-                start_researcher_index = int(i)
-            if name in end_researchers:
-                end_researchers_indexes.append(int(i))
+    researchers_names = [''] # Índice 0 é nulo
+    start_researcher_index = None
+
+    try:
+        # Adicionado encoding='utf-8' para nomes com acentos (ex: Éva Tardos)
+        with open(researchers_names_file_path, 'r', encoding='utf-8') as f:
+            for line in f.readlines():
+                # Faz a leitura de forma mais segura, caso o nome tenha vírgula
+                parts = line.strip().split(',')
+                if len(parts) < 2:
+                    continue
+                
+                i = int(parts[0])
+                name = ','.join(parts[1:]).strip() # Pega o resto da linha
+                
+                # Garante que o array de nomes tenha o tamanho correto
+                while len(researchers_names) <= i:
+                    researchers_names.append('')
+                
+                researchers_names[i] = name
+                
+                if start_researcher == name:
+                    start_researcher_index = i
+                if name in end_researchers:
+                    end_researchers_indexes.append(i)
+                    
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Arquivo de nomes de pesquisadores não encontrado em: {researchers_names_file_path}")
+    except Exception as e:
+        print(f"Erro ao ler o arquivo de pesquisadores: {e}")
+        return {}
 
     if not start_researcher_index:
-        raise ValueError(f'Start researcher "{start_researcher}" not found in researchers names file.')
-    
-    # Run Dijkstra once from the source researcher
+        raise ValueError(f'Pesquisador inicial "{start_researcher}" não foi encontrado no arquivo.')
+
+    # Roda o Dijkstra
     distances_and_fathers = graph.get_all_distances_and_fathers(start_researcher_index)
 
-    print(end_researchers_indexes) 
-    
-    # Build result list for target researchers
-    return [
-        {
-            researchers_names[end]: (
-                distances_and_fathers[end][0],
-                # Map father index back to name
-                researchers_names[distances_and_fathers[end][1]] if distances_and_fathers[end][1] is not None else None
-            )
-        }
-        for end in end_researchers_indexes
-    ]
+    # Retorna todos os dados para o main.py processar
+    return {
+        "distances_and_fathers": distances_and_fathers,
+        "researchers_names": researchers_names,
+        "target_indices": end_researchers_indexes,
+        "start_researcher_name": start_researcher
+    }

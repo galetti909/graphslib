@@ -30,3 +30,4 @@ class AdjacencyVector(GraphStructure):
     def get_neighbors(self, node: int) -> list[tuple[int, float]]:
         self.validate_node_index(node)
         return self.adjacency_vector[node]
+    
