@@ -160,7 +160,7 @@ class GraphStructure(ABC):
         components.sort(key=len, reverse=True)
         return len(components), components
 
-    def get_all_distances_and_fathers(self, start_node: int, queue_type: Type[GenericDijkstraStructuresManager] = DijkstraHeap) -> list[tuple[float, int | None]]:
+    def get_all_distances_and_fathers_from_start_node(self, start_node: int, queue_type: Type[GenericDijkstraStructuresManager] = DijkstraHeap) -> list[tuple[float, int | None]]:
         '''Given a start node, returns the distance to all other nodes, and its father through best path'''
         if self.has_negative_weight:
             raise ValueError('Graph contains negative weight edges; Dijkstra\'s algorithm cannot be applied. Algorithms for negative weights not implemented yet.')
@@ -170,6 +170,25 @@ class GraphStructure(ABC):
             for neighbor, weight in self.get_out_neighbors(current_node):
                 dijkstra_manager.update_distance(current_node, current_distance, neighbor, weight)
         return dijkstra_manager.result()
+    
+    def get_all_distances_and_sons_to_end_node(self, end_node: int) -> list[tuple[float, int | None]]:
+        '''Given an end node, returns the distance from all other nodes, and its sons through best path'''
+        self.validate_node_index(end_node)
+        node_count = self.get_node_count()
+        distances_and_sons: list[tuple[float, int | None]] = [(float('inf'), None) for _ in range(node_count + 1)]
+        distances_and_sons[end_node] = (0.0, None)
+        converged = False
+        for i in range(1, node_count):
+            if converged:
+                break
+            converged = True
+            for node in range(1, node_count + 1):
+                distances_and_sons[i][node] = distances_and_sons[i-1][node]
+                for neighbor, weight in self.get_out_neighbors(node):
+                    if distances_and_sons[i-1][neighbor][0] + weight < distances_and_sons[i][node][0]:
+                        distances_and_sons[i][node] = (distances_and_sons[i-1][neighbor][0] + weight, neighbor)
+                        converged = False
+        return distances_and_sons
 
     def generate_graph_text_file(self, file_path: str) -> None:
         '''Generates a text file representation of the graph's properties.'''
