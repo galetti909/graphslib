@@ -13,12 +13,12 @@ def case_2_dijkstra_performance_comparison(graph: GraphStructure) -> tuple[float
     def measure_dijkstra_time(queue_type: Type[GenericDijkstraStructuresManager]) -> float:
         total_time = 0
         n = graph.get_node_count()
-        for start_node in random.sample(range(1, n + 1), 1):
+        for start_node in random.sample(range(1, n + 1), 5):
             start_time = time.perf_counter()
             graph.get_all_distances_and_fathers(start_node, queue_type)
             end_time = time.perf_counter()
             total_time += (end_time - start_time)
-        return total_time / 1
+        return total_time / 5
     avg_time_vector = measure_dijkstra_time(DijkstraVector)
     avg_time_heap = measure_dijkstra_time(DijkstraHeap)
     return avg_time_vector, avg_time_heap
