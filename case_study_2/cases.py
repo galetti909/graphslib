@@ -7,7 +7,7 @@ from lib.classes.dijkstra.dijkstra_vector import DijkstraVector
 from lib.classes.dijkstra.generic_dijkstra_structures_manager import GenericDijkstraStructuresManager
 
 def case_1_min_distances(graph: GraphStructure, start_node: int) -> list[float]:
-    return graph.get_all_distances_and_fathers(start_node)
+    return graph.get_all_distances_and_fathers_from_start_node(start_node)
 
 def case_2_dijkstra_performance_comparison(graph: GraphStructure) -> tuple[float, float]:
     def measure_dijkstra_time(queue_type: Type[GenericDijkstraStructuresManager]) -> float:
@@ -15,7 +15,7 @@ def case_2_dijkstra_performance_comparison(graph: GraphStructure) -> tuple[float
         n = graph.get_node_count()
         for start_node in random.sample(range(1, n + 1), 5):
             start_time = time.perf_counter()
-            graph.get_all_distances_and_fathers(start_node, queue_type)
+            graph.get_all_distances_and_fathers_from_start_node(start_node, queue_type)
             end_time = time.perf_counter()
             total_time += (end_time - start_time)
         return total_time / 5
@@ -40,7 +40,7 @@ def case_3_distance_between_researchers(graph: GraphStructure, researchers_names
 
     if not start_researcher_index:
         raise ValueError(f'Start researcher "{start_researcher}" not found in researchers names file.')
-    distances_and_fathers = graph.get_all_distances_and_fathers(start_researcher_index)
+    distances_and_fathers = graph.get_all_distances_and_fathers_from_start_node(start_researcher_index)
 
     print(end_researchers_indexes)
     return [
