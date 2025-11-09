@@ -188,6 +188,11 @@ class GraphStructure(ABC):
                     if distances_and_sons[i-1][neighbor][0] + weight < distances_and_sons[i][node][0]:
                         distances_and_sons[i][node] = (distances_and_sons[i-1][neighbor][0] + weight, neighbor)
                         converged = False
+        else:
+            for node in range(1, node_count + 1):
+                for neighbor, weight in self.get_out_neighbors(node):
+                        if distances_and_sons[i-1][neighbor][0] + weight < distances_and_sons[i][node][0]:
+                            raise ValueError('Graph contains a negative weight cycle; shortest paths not well-defined.')
         return distances_and_sons
 
     def generate_graph_text_file(self, file_path: str) -> None:
