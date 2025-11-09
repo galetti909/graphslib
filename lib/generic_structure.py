@@ -7,8 +7,14 @@ from lib.classes.dijkstra.generic_dijkstra_structures_manager import GenericDijk
 
 class GraphStructure(ABC):
     @abstractmethod
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path: str, is_directed: bool) -> None:
         '''Initializes the graph structure from a text file.'''
+        pass
+
+    @property
+    @abstractmethod
+    def is_directed(self) -> bool:
+        '''Indicates whether the graph is directed.'''
         pass
 
     @property
@@ -18,7 +24,7 @@ class GraphStructure(ABC):
         pass
 
     @abstractmethod
-    def get_neighbors(self, node: int) -> list[int]:
+    def get_out_neighbors(self, node: int) -> list[int]:
         '''Returns the list of neighboring nodes for the given node.'''
         pass
 
@@ -36,29 +42,31 @@ class GraphStructure(ABC):
 
     def get_edge_count(self) -> int:
         '''Returns the total number of edges in the graph.'''
-        return sum(len(self.get_neighbors(node)) for node in range(1, self.get_node_count() + 1)) // 2
+        return sum(len(self.get_out_neighbors(node)) for node in range(1, self.get_node_count() + 1)) // (1 if self.is_directed else 2)
 
-    def get_min_degree(self) -> int:
-        '''Returns the minimum degree of any node in the graph.'''
-        return min(len(self.get_neighbors(node)) for node in range(1, self.get_node_count() + 1))
+    def get_min_out_degree(self) -> int:
+        '''Returns the minimum out degree of any node in the graph.'''
+        return min(len(self.get_out_neighbors(node)) for node in range(1, self.get_node_count() + 1))
 
-    def get_max_degree(self) -> int:
-        '''Returns the maximum degree of any node in the graph.'''
-        return max(len(self.get_neighbors(node)) for node in range(1, self.get_node_count() + 1))
+    def get_maxnode_out_degree(self) -> int:
+        '''Returns the maximum out degree of any node in the graph.'''
+        if self.is_directed:
+            raise NotImplementedError('Maximum degree calculation is not implemented for directed graphs.')
+        return max(len(self.get_out_neighbors(node)) for node in range(1, self.get_node_count() + 1))
 
-    def get_average_degree(self) -> float:
-        '''Returns the average degree of nodes in the graph.'''
+    def get_average_out_degree(self) -> float:
+        '''Returns the average out degree of nodes in the graph.'''
         node_count = self.get_node_count()
         if node_count == 0:
             return 0.0
-        return sum(len(self.get_neighbors(node)) for node in range(1, node_count + 1)) / node_count
+        return sum(len(self.get_out_neighbors(node)) for node in range(1, node_count + 1)) / node_count
 
-    def get_median_degree(self) -> float:
-        '''Returns the median degree of nodes in the graph.'''
+    def get_median_out_degree(self) -> float:
+        '''Returns the median out degree of nodes in the graph.'''
         node_count = self.get_node_count()
         if node_count == 0:
             return 0.0
-        sorted_degrees = sorted(len(self.get_neighbors(node)) for node in range(1, node_count + 1))
+        sorted_degrees = sorted(len(self.get_out_neighbors(node)) for node in range(1, node_count + 1))
         mid_index = node_count // 2
         if node_count % 2 == 0:
             return (sorted_degrees[mid_index - 1] + sorted_degrees[mid_index]) / 2
@@ -74,7 +82,7 @@ class GraphStructure(ABC):
         queue = deque([start_node])
         while queue:
             current_node = queue.popleft()
-            for neighbor_index, _ in self.get_neighbors(current_node):
+            for neighbor_index, _ in self.get_out_neighbors(current_node):
                 if visited[neighbor_index][1] is None:
                     visited[neighbor_index] = (current_node, visited[current_node][1] + 1)
                     queue.append(neighbor_index)
@@ -100,7 +108,7 @@ class GraphStructure(ABC):
             
             visited[current_node] = (parent, depth)
             
-            for neighbor_index, _ in sorted(self.get_neighbors(current_node), reverse=True):
+            for neighbor_index, _ in sorted(self.get_out_neighbors(current_node), reverse=True):
                 if visited[neighbor_index][1] is None:
                     stack.append((neighbor_index, current_node, depth + 1))
 
@@ -111,14 +119,14 @@ class GraphStructure(ABC):
                     f.write(f'{index}\t{parent}\t{depth}\n')
         return visited
 
-    def get_distance(self, node_1: int, node_2: int) -> int | None:
-        '''Returns the shortest distance between two nodes, or None if unreachable.'''
+    def get_edge_distance(self, node_1: int, node_2: int) -> int | None:
+        '''Returns the shortest distance in edges between two nodes, or None if unreachable.'''
         self.validate_node_index(node_2)
         bfs_result = self.search_breadth_first(node_1)
         return bfs_result[node_2][1]
 
-    def get_diameter(self) -> int | None:
-        '''Returns the diameter of the graph, or None if the graph is disconnected.'''
+    def get_edge_diameter(self) -> int | None:
+        '''Returns the diameter, considering distance in edges, of the graph, or None if the graph is disconnected.'''
         if self.get_node_count() <= 1:
             return None
             
@@ -159,7 +167,7 @@ class GraphStructure(ABC):
         dijkstra_manager = queue_type(start_node, self.get_node_count())
         while next := dijkstra_manager.get_next_min():
             current_node, current_distance = next
-            for neighbor, weight in self.get_neighbors(current_node):
+            for neighbor, weight in self.get_out_neighbors(current_node):
                 dijkstra_manager.update_distance(current_node, current_distance, neighbor, weight)
         return dijkstra_manager.result()
 
@@ -179,9 +187,9 @@ class GraphStructure(ABC):
         return (
             f'Número de Vértices: {self.get_node_count()}\n'
             f'Número de Arestas: {self.get_edge_count()}\n'
-            f'Grau Mínimo: {self.get_min_degree()}\n'
-            f'Grau Máximo: {self.get_max_degree()}\n'
-            f'Grau Médio: {self.get_average_degree():.2f}\n'
-            f'Mediana de Grau: {self.get_median_degree()}\n'
+            f'Grau de Saída Mínimo: {self.get_min_out_degree()}\n'
+            f'Grau de Saída Máximo: {self.get_max_out_degree()}\n'
+            f'Grau de Saída Médio: {self.get_average_out_degree():.2f}\n'
+            f'Mediana de Grau de Saída: {self.get_median_out_degree()}\n'
             f'Componentes Conexas: {count}\n{connected_components_text}'
         )
