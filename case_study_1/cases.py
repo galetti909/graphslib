@@ -32,13 +32,13 @@ def case_4_parents_in_search_trees(graph: GraphStructure, start_vertice: int, ta
     return bfs_parents, dfs_parents
 
 def case_5_distance_between_vertices(graph: GraphStructure, node_1: int, node_2: int) -> int | None:
-    return graph.get_distance(node_1, node_2)
+    return graph.get_edge_distance(node_1, node_2)
 
 def case_6_connected_components(graph: GraphStructure) -> tuple[int, list[list[int]]]:
     count_cc, connected_components = graph.list_connected_components()
     return count_cc, len(connected_components[0])
 
 def case_7_graph_diameter(graph: GraphStructure) -> int | None:
-    return graph.get_diameter()
+    return graph.get_edge_diameter()
 
 
