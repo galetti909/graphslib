@@ -53,6 +53,7 @@ def run_case_study_3(graph_file_path: str) -> None:
     )
 
     print("\nCalculating average execution time for Dijkstra's algorithm...")
+    total_time = 0
     for node in random_nodes:
         start_time = time.perf_counter()
         reversed_graph.get_all_distances_and_fathers_from_start_node(node)
