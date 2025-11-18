@@ -48,7 +48,7 @@ class GraphStructure(ABC):
         '''Returns the minimum out degree of any node in the graph.'''
         return min(len(self.get_out_neighbors(node)) for node in range(1, self.get_node_count() + 1))
 
-    def get_maxnode_out_degree(self) -> int:
+    def get_max_out_degree(self) -> int:
         '''Returns the maximum out degree of any node in the graph.'''
         if self.is_directed:
             raise NotImplementedError('Maximum degree calculation is not implemented for directed graphs.')
