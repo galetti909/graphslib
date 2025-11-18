@@ -1,7 +1,7 @@
 from .generic_structure import GraphStructure
 
 class AdjacencyMatrix(GraphStructure):
-    def __init__(self, file_path: str, is_directed: bool, reverse: bool = False) -> None:
+    def __init__(self, file_path: str, is_directed: bool = False, reverse: bool = False) -> None:
         self._is_directed = is_directed
         try:
             self._has_negative_weight = False

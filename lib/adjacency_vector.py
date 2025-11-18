@@ -1,7 +1,7 @@
 from .generic_structure import GraphStructure
 
 class AdjacencyVector(GraphStructure):
-    def __init__(self, file_path: str, is_directed: bool) -> None:
+    def __init__(self, file_path: str, is_directed: bool = False, reverse: bool = False) -> None:
         self._is_directed = is_directed
         with open(file_path, 'r') as f:
             self._has_negative_weight = False
@@ -12,6 +12,8 @@ class AdjacencyVector(GraphStructure):
                 nodes = line.strip().split()
                 if len(nodes) == 2:
                     nodes.append('1.0')
+                if reverse:
+                        nodes[0], nodes[1] = nodes[1], nodes[0]
                 self.add_edge(int(nodes[0]), int(nodes[1]), float(nodes[2]))
                 if not is_directed:
                     self.add_edge(int(nodes[1]), int(nodes[0]), float(nodes[2]))
