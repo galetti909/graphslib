@@ -25,7 +25,7 @@ class GraphStructure(ABC):
 
     @abstractmethod
     def get_out_neighbors(self, node: int) -> list[int]:
-        '''Returns the list of neighboring nodes for the given node.'''
+        '''Returns the list of out-neighboring nodes for the given node.'''
         pass
 
     @abstractmethod
